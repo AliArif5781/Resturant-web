@@ -28,7 +28,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Image is required" });
       }
 
-      const { name, weight, price, category, description } = req.body;
+      const { name, weight, price, category, description, prepTime } = req.body;
 
       // Convert buffer to base64 and upload to Cloudinary
       const b64 = Buffer.from(req.file.buffer).toString("base64");
@@ -50,6 +50,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         price,
         category,
         description: description || undefined,
+        prepTime: prepTime || undefined,
         imageUrl: result.secure_url,
       });
 

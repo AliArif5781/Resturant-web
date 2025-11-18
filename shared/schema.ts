@@ -8,6 +8,7 @@ export const dishSchema = z.object({
   price: z.string(),
   category: z.string(),
   description: z.string().optional(),
+  prepTime: z.string().optional(),
   imageUrl: z.string(),
   createdAt: z.number(),
 });

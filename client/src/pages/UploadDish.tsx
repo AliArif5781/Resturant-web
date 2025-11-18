@@ -35,6 +35,7 @@ const dishFormSchema = z.object({
   price: z.string().min(1, "Price is required"),
   category: z.string().min(1, "Category is required"),
   description: z.string().optional(),
+  prepTime: z.string().optional(),
 });
 
 type DishFormValues = z.infer<typeof dishFormSchema>;
@@ -53,6 +54,7 @@ export default function UploadDish() {
       price: "",
       category: "",
       description: "",
+      prepTime: "",
     },
   });
 
@@ -127,6 +129,9 @@ export default function UploadDish() {
     formData.append("category", data.category);
     if (data.description) {
       formData.append("description", data.description);
+    }
+    if (data.prepTime) {
+      formData.append("prepTime", data.prepTime);
     }
 
     uploadDishMutation.mutate(formData);
@@ -265,6 +270,20 @@ export default function UploadDish() {
                             <SelectItem value="Beverage">Beverage</SelectItem>
                           </SelectContent>
                         </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="prepTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Preparation Time (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., 30 mins or 1 hour" {...field} data-testid="input-preptime" />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

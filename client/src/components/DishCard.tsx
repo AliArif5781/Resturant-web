@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Clock } from "lucide-react";
 
 export interface Dish {
   id: string;
@@ -8,6 +9,7 @@ export interface Dish {
   price: string;
   category: string;
   description?: string;
+  prepTime?: string;
   imageUrl: string;
 }
 
@@ -45,6 +47,12 @@ export default function DishCard({ dish }: DishCardProps) {
             {dish.price}
           </span>
         </div>
+        {dish.prepTime && (
+          <div className="flex items-center gap-1 mb-2 text-sm text-muted-foreground" data-testid={`text-preptime-${dish.id}`}>
+            <Clock className="w-4 h-4" />
+            <span>{dish.prepTime}</span>
+          </div>
+        )}
         {dish.description && (
           <p className="text-sm text-muted-foreground line-clamp-2" data-testid={`text-description-${dish.id}`}>
             {dish.description}
