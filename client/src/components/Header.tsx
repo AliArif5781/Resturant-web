@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
 import { Menu, X, UtensilsCrossed } from "lucide-react";
 import { useState, useEffect } from "react";
+import Cart from "@/components/Cart";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,12 +38,13 @@ export default function Header() {
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-4">
             <Link href="/" data-testid="link-menu">
               <span className={`hover-elevate active-elevate-2 px-3 py-2 rounded-md ${isScrolled || !isHomePage ? "text-foreground" : "text-white"}`}>
                 Menu
               </span>
             </Link>
+            <Cart />
             <Link href="/upload" data-testid="link-add-dish">
               <Button variant={isScrolled || !isHomePage ? "default" : "outline"} className={!isScrolled && isHomePage ? "bg-white/10 border-white/30 text-white hover:bg-white/20" : ""}>
                 Add Dish
@@ -69,6 +71,9 @@ export default function Header() {
               <Link href="/" data-testid="link-menu-mobile">
                 <span className="block hover-elevate active-elevate-2 px-3 py-2 rounded-md">Menu</span>
               </Link>
+              <div className="px-3">
+                <Cart />
+              </div>
               <Link href="/upload" data-testid="link-add-dish-mobile">
                 <Button className="w-full">Add Dish</Button>
               </Link>
