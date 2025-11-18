@@ -23,43 +23,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Upload dish with image
   app.post("/api/dishes", upload.single("image"), async (req, res) => {
     try {
+      // Check for image first
+      if (!req.file) {
+        return res.status(400).json({ error: "Image is required" });
+      }
+
       const { name, weight, price, category, description } = req.body;
-      
-      // Validate input
+
+      // Convert buffer to base64 and upload to Cloudinary
+      const b64 = Buffer.from(req.file.buffer).toString("base64");
+      const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+
+      const result = await cloudinary.uploader.upload(dataURI, {
+        folder: "restaurant_dishes",
+        resource_type: "auto",
+      });
+
+      if (!result.secure_url) {
+        return res.status(500).json({ error: "Failed to upload image to Cloudinary" });
+      }
+
+      // Now validate with the actual Cloudinary URL
       const validatedData = insertDishSchema.parse({
         name,
         weight,
         price,
         category,
         description: description || undefined,
-        imageUrl: "", // Will be set after Cloudinary upload
-      });
-
-      // Upload image to Cloudinary
-      if (!req.file) {
-        return res.status(400).json({ error: "Image is required" });
-      }
-
-      // Convert buffer to base64
-      const b64 = Buffer.from(req.file.buffer).toString("base64");
-      const dataURI = `data:${req.file.mimetype};base64,${b64}`;
-
-      // Upload to Cloudinary
-      const result = await cloudinary.uploader.upload(dataURI, {
-        folder: "restaurant_dishes",
-        resource_type: "auto",
-      });
-
-      // Save to Firebase with Cloudinary URL
-      const dishData = {
-        ...validatedData,
         imageUrl: result.secure_url,
-      };
+      });
 
-      const newDish = await addDish(dishData);
+      // Save to Firebase
+      const newDish = await addDish(validatedData);
       res.status(201).json(newDish);
     } catch (error) {
       console.error("Error creating dish:", error);
+      if (error instanceof Error && error.name === 'ZodError') {
+        return res.status(400).json({ error: "Invalid dish data", details: error });
+      }
       res.status(500).json({ error: "Failed to create dish" });
     }
   });

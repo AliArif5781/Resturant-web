@@ -19,15 +19,28 @@ export const dishesCollection = collection(db, "dishes");
 // Helper functions
 export async function getAllDishes() {
   const snapshot = await getDocs(dishesCollection);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      // Ensure createdAt is a number (convert Firestore Timestamp if needed)
+      createdAt: data.createdAt instanceof Timestamp 
+        ? data.createdAt.toMillis() 
+        : typeof data.createdAt === 'number' 
+        ? data.createdAt 
+        : Date.now()
+    };
+  });
 }
 
 export async function addDish(dishData: any) {
+  const createdAt = Date.now();
   const docRef = await addDoc(dishesCollection, {
     ...dishData,
-    createdAt: Date.now(),
+    createdAt,
   });
-  return { id: docRef.id, ...dishData };
+  return { id: docRef.id, ...dishData, createdAt };
 }
 
 export async function getDishById(id: string) {
