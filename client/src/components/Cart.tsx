@@ -96,7 +96,7 @@ export default function Cart() {
               <div className="flex items-center justify-between text-lg font-semibold">
                 <span>Total:</span>
                 <span className="text-primary" data-testid="text-cart-total">
-                  Rs. {getCartTotal().toFixed(2)}
+                  ${getCartTotal().toFixed(2)}
                 </span>
               </div>
               

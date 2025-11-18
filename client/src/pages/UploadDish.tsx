@@ -242,7 +242,7 @@ export default function UploadDish() {
                         <FormItem>
                           <FormLabel>Price *</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., Rs. 450" {...field} data-testid="input-price" />
+                            <Input placeholder="e.g., $15.99" {...field} data-testid="input-price" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
