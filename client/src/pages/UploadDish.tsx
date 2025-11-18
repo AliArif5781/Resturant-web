@@ -24,7 +24,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Upload, X } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 const dishFormSchema = z.object({
   name: z.string().min(1, "Dish name is required"),
@@ -39,6 +42,8 @@ type DishFormValues = z.infer<typeof dishFormSchema>;
 export default function UploadDish() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   const form = useForm<DishFormValues>({
     resolver: zodResolver(dishFormSchema),
@@ -48,6 +53,42 @@ export default function UploadDish() {
       price: "",
       category: "",
       description: "",
+    },
+  });
+
+  const uploadDishMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await fetch("/api/dishes", {
+        method: "POST",
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to upload dish");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/dishes"] });
+      toast({
+        title: "Success!",
+        description: "Dish uploaded successfully",
+      });
+      form.reset();
+      setImagePreview(null);
+      setSelectedFile(null);
+      setTimeout(() => {
+        setLocation("/");
+      }, 1000);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: "Failed to upload dish. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Upload error:", error);
     },
   });
 
@@ -69,14 +110,26 @@ export default function UploadDish() {
   };
 
   const onSubmit = (data: DishFormValues) => {
-    //todo: remove mock functionality - implement actual Cloudinary upload and Firebase storage
-    console.log("Form submitted:", data);
-    console.log("Image file:", selectedFile);
-    
-    alert("Dish uploaded successfully! (This is a preview - backend integration pending)");
-    form.reset();
-    setImagePreview(null);
-    setSelectedFile(null);
+    if (!selectedFile) {
+      toast({
+        title: "Error",
+        description: "Please select an image",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+    formData.append("name", data.name);
+    formData.append("weight", data.weight);
+    formData.append("price", data.price);
+    formData.append("category", data.category);
+    if (data.description) {
+      formData.append("description", data.description);
+    }
+
+    uploadDishMutation.mutate(formData);
   };
 
   return (
@@ -237,11 +290,23 @@ export default function UploadDish() {
                   />
 
                   <div className="flex gap-4 pt-4">
-                    <Button type="submit" size="lg" className="flex-1" data-testid="button-publish">
-                      Publish Dish
+                    <Button 
+                      type="submit" 
+                      size="lg" 
+                      className="flex-1" 
+                      data-testid="button-publish"
+                      disabled={uploadDishMutation.isPending}
+                    >
+                      {uploadDishMutation.isPending ? "Uploading..." : "Publish Dish"}
                     </Button>
                     <Link href="/">
-                      <Button type="button" size="lg" variant="outline" data-testid="button-cancel">
+                      <Button 
+                        type="button" 
+                        size="lg" 
+                        variant="outline" 
+                        data-testid="button-cancel"
+                        disabled={uploadDishMutation.isPending}
+                      >
                         Cancel
                       </Button>
                     </Link>
