@@ -1,6 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Clock, Plus } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 
 export interface Dish {
   id: string;
@@ -18,6 +21,16 @@ interface DishCardProps {
 }
 
 export default function DishCard({ dish }: DishCardProps) {
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+
+  const handleAddToCart = () => {
+    addToCart(dish);
+    toast({
+      title: "Added to cart",
+      description: `${dish.name} has been added to your cart`,
+    });
+  };
   return (
     <Card className="overflow-hidden hover-elevate active-elevate-2" data-testid={`card-dish-${dish.id}`}>
       <div className="relative aspect-square overflow-hidden">
@@ -54,10 +67,18 @@ export default function DishCard({ dish }: DishCardProps) {
           </div>
         )}
         {dish.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2" data-testid={`text-description-${dish.id}`}>
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-4" data-testid={`text-description-${dish.id}`}>
             {dish.description}
           </p>
         )}
+        <Button 
+          onClick={handleAddToCart}
+          className="w-full mt-4" 
+          data-testid={`button-add-to-cart-${dish.id}`}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add to Cart
+        </Button>
       </CardContent>
     </Card>
   );
