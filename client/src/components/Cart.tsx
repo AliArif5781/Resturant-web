@@ -58,9 +58,8 @@ export default function Cart() {
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <Button
-                          size="icon"
+                          size="sm"
                           variant="outline"
-                          className="h-7 w-7"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           data-testid={`button-decrease-${item.id}`}
                         >
@@ -70,9 +69,8 @@ export default function Cart() {
                           {item.quantity}
                         </span>
                         <Button
-                          size="icon"
+                          size="sm"
                           variant="outline"
-                          className="h-7 w-7"
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           data-testid={`button-increase-${item.id}`}
                         >
@@ -81,7 +79,7 @@ export default function Cart() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-7 w-7 ml-auto"
+                          className="ml-auto"
                           onClick={() => removeFromCart(item.id)}
                           data-testid={`button-remove-${item.id}`}
                         >
