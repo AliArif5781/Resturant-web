@@ -1,18 +1,18 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// Dish schema for Firebase storage
+export const dishSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  weight: z.string(),
+  price: z.string(),
+  category: z.string(),
+  description: z.string().optional(),
+  imageUrl: z.string(),
+  createdAt: z.number(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
+export const insertDishSchema = dishSchema.omit({ id: true, createdAt: true });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+export type Dish = z.infer<typeof dishSchema>;
+export type InsertDish = z.infer<typeof insertDishSchema>;
