@@ -31,6 +31,14 @@ export default function DishCard({ dish }: DishCardProps) {
       description: `${dish.name} has been added to your cart`,
     });
   };
+
+  const formatPrice = (price: string) => {
+    if (price.startsWith('$')) {
+      return price;
+    }
+    return `$${price}`;
+  };
+
   return (
     <Card className="overflow-hidden hover-elevate active-elevate-2" data-testid={`card-dish-${dish.id}`}>
       <div className="relative aspect-square overflow-hidden">
@@ -57,7 +65,7 @@ export default function DishCard({ dish }: DishCardProps) {
             {dish.weight}
           </span>
           <span className="text-xl font-semibold text-primary" data-testid={`text-price-${dish.id}`}>
-            {dish.price}
+            {formatPrice(dish.price)}
           </span>
         </div>
         {dish.prepTime && (
